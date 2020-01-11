@@ -119,7 +119,7 @@ class bgCoin(bgObject):
 
 class charObject:
 	def __init__(self):
-		self.y=terminalSize()[1]-3
+		self.y=terminalSize()[1]-2
 		self.x=7		
 
 	def renderObject(self):
