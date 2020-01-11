@@ -70,9 +70,9 @@ def terminalSize():
 	return w, h
 
 
-def background():
+def background(score, timeLeft):
 		print (' '*terminalSize()[0])
-
+		print ('\033[0;0H SCORE:'+str(score)+' TIME LEFT:'+str(timeLeft))
 		print ('-'*terminalSize()[0])
 
 
@@ -184,7 +184,7 @@ class bgBeams(bgObject):
 
 class vertBeam(bgBeams):
 	def __init__(self):
-		self.y=np.random.randint(7,terminalSize()[1]-5)
+		self.y=np.random.randint(5,terminalSize()[1]-3)
 
 		super().__init__()
 
@@ -200,7 +200,7 @@ class vertBeam(bgBeams):
 		self.moveAcross()
 		
 		if self.x!=-1:
-			self.j=self.y
+			self.j=self.y-2
 			for i in range(5):
 
 				print ('\033['+ str(self.j) +';' + str(self.x) + 'H 0')
@@ -227,8 +227,50 @@ class horiBeam(bgBeams):
 		if self.x!=-1:
 			self.j=self.x-8
 			for i in range(5):
-				print ('\033['+ str(self.y) +';' + str(self.j) + 'H 00000')
-				self.j+=1
+				print ('\033['+ str(self.y) +';' + str(self.j) + 'H 0')
+				self.j+=2
+
+class diagBeam(bgBeams):
+		def __init__(self):
+			self.y=np.random.randint(5,terminalSize()[1]-3)
+
+			super().__init__()
+
+		def moveAcross(self):
+			if self.x>5:
+				self.x-=1
+			else:
+				self.x=-1
+
+class diagLeftBeam(diagBeam):
+		def __init__(self):
+			super().__init__()
+
+		def renderObject(self):
+			self.moveAcross()
+		
+			if self.x!=-1:
+				self.j=self.x-8
+				self.k=self.y-2
+				for i in range(5):
+					print ('\033['+ str(self.k) +';' + str(self.j) + 'H 0')
+					self.j+=2
+					self.k+=1
+
+class diagRightBeam(diagBeam):
+		def __init__(self):
+			super().__init__()
+
+		def renderObject(self):
+			self.moveAcross()
+		
+			if self.x!=-1:
+				self.j=self.x-8
+				self.k=self.y-2
+				for i in range(5):
+					print ('\033['+ str(self.k) +';' + str(self.j) + 'H 0')
+					self.j-=2
+					self.k+=1
 
 
 
@@ -239,12 +281,17 @@ def mainGame():
 	bulletList=[]
 	vertBeamList=[]
 	horiBeamList=[]
+	leftBeamList=[]
+	rightBeamList=[]
+	timeLeft=120
+	score=0
 	Din= dinObject()
-
 	while True:
 			time.sleep(0.02)
-			background()
-			
+			timeLeft-=0.2
+			background(score,timeLeft)
+			if timeLeft<=0:
+				break
 			Din.renderObject()
 
 			prob=np.random.random_sample()
@@ -263,6 +310,17 @@ def mainGame():
 			if(prob>=0.95):
 				beam=horiBeam()
 				horiBeamList.append(beam)
+			
+			prob=np.random.random_sample()
+			if(prob>=0.95):
+				beam=diagLeftBeam()
+				leftBeamList.append(beam)
+
+
+			prob=np.random.random_sample()
+			if(prob>=0.95):
+				beam=diagRightBeam()
+				rightBeamList.append(beam)
 
 			for i in range(len(coinList)):
 				coinList[i].renderObject()
@@ -278,6 +336,11 @@ def mainGame():
 			for i in range(len(horiBeamList)):
 				horiBeamList[i].renderObject()
 
+			for i in range(len(leftBeamList)):
+				leftBeamList[i].renderObject()
+			
+			for i in range(len(rightBeamList)):
+				rightBeamList[i].renderObject()
 
 			val=inputChar()
 
