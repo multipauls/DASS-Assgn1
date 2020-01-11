@@ -71,8 +71,12 @@ def terminalSize():
 
 
 def background(y, x):
+		print (' '*terminalSize()[0])
+
 		print ('-'*terminalSize()[0])
-		for i in range(terminalSize()[1]-3):
+
+
+		for i in range(terminalSize()[1]-4):
 			print(' '*terminalSize()[0])
 
 		print ('-'*terminalSize()[0])
@@ -81,22 +85,36 @@ def background(y, x):
 
 
 def gravity(y,val):
-	if val!='w' and y>3:
-		y-=1
+	if val!='w' and y<terminalSize()[1]-4:
+		y+=1
 	return y
+
 
 
 
 class bgObject:
 	def __init__(self):
-		self.y=np.random.randint(5,terminalSize()[1]-1)
-	def getY(self):
-		return self.y
+		self.y=np.random.randint(5,terminalSize()[1]-3)
+		self.x=terminalSize()[0]-1
 
+	def getXY(self):
+		return self.x, self.y
+
+	def moveAcross(self):
+		if self.x>0:
+			self.x-=1
+		else:
+			self.x=-1
 
 class bgCoin(bgObject):
+	def __init__(self):
+		
+		super().__init__()
+
 	def renderObject(self):
-		print ('\033['+ str(self.y) +';' + str(terminalSize()[0]-1)+'H O')
+		self.moveAcross()
+		if self.x!=-1:
+			print ('\033['+ str(self.y) +';' + str(self.x)+'H O')
 
 
 
@@ -105,16 +123,38 @@ class bgCoin(bgObject):
 
 
 def mainGame():
-	y=3
+	y=terminalSize()[1]-3
 	x=7
 	coinList=[]
 	while True:
 			time.sleep(0.1)
 			background(y,x)
+			if (y<terminalSize()[1]-3):
+				y=terminalSize()[1]-3
+			print ('\033['+ str(y) +';' + str(x) + 'H ' + str(x)+str(y)+' '+str(terminalSize()[1]))
 			
+			#f = open("demofile.txt", "a")
+
+
+			prob=np.random.uniform()
+			
+
+
+			if(prob>=0.9):
+				coin=bgCoin()
+				coinList.append(coin)
+#			f.write("\n"+str(len(coinList))+"\n")
+
+			for i in range(len(coinList)):
+				coinList[i].renderObject()
+#				f.write(str(coinList[i].getY())+"\n")
+#			f.close()
+
+
 			val=inputChar()
+
 			if (val=='w' and y<terminalSize()[1]-1):
-					y+=1
+					y-=1
 			elif (val=='a' and x>0):
 					x-=1
 			elif (val=='d' and x<terminalSize()[0]):
@@ -122,25 +162,10 @@ def mainGame():
 			elif (val=='c'):
 				break
 			y=gravity(y,val)
-			print('\u001b['+ str(y) +'A ') 
-			print('\u001b['+ str(x) + 'C ' + str(y) + str(x)+' '+str(terminalSize()[1]) )
-
-			f = open("demofile.txt", "a")
-
-
-			prob=np.random.uniform()
+		
 			
 
-
-			if(prob>=0.5):
-				coin=bgCoin()
-				coinList.append(coin)
-			f.write("\n"+str(len(coinList))+"\n")
-
-			for i in range(len(coinList)):
-				coinList[i].renderObject()
-				f.write(str(coinList[i].getY())+"\n")
-			f.close()
+			
 
 
 mainGame()
