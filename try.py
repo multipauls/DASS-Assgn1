@@ -103,6 +103,19 @@ class bgObject:
 		else:
 			self.x=-1
 
+class speedBoost(bgObject):
+	def renderObject(self):
+		self.moveAcross()
+		if self.x!=-1:
+			print ('\033['+ str(self.y) +';' + str(self.x)+'H X')
+
+class shield(bgObject):
+	def renderObject(self):
+		self.moveAcross()
+		if self.x!=-1:
+			print ('\033['+ str(self.y) +';' + str(self.x)+'H C')
+
+
 class bgCoin(bgObject):
 	def __init__(self):
 		
@@ -132,7 +145,8 @@ class charObject:
 
 class dinObject(charObject):
 	def __init__(self):
-		
+		self.speedBoost=0
+		self.shield=0
 		super().__init__()
 
 	def gravity(self,val):#,gravCount):
@@ -145,13 +159,24 @@ class dinObject(charObject):
 		return self.x, self.y
 
 	def moveDin(self, val):
-		if (val=='w') and self.y>3:
-					self.y-=1
-		elif (val=='a' and self.x>0):
-					self.x-=1
-		elif (val=='d' and self.x<terminalSize()[0]):
-					self.x+=1
-		self.gravity(val)
+		if self.speedBoost==0:
+			if (val=='w') and self.y>3:
+						self.y-=1
+			elif (val=='a' and self.x>0):
+						self.x-=1
+			elif (val=='d' and self.x<terminalSize()[0]):
+						self.x+=1
+			self.gravity(val)
+		 
+		else:
+			if (val=='w') and self.y>3:
+						self.y-=2
+			elif (val=='a' and self.x>0):
+						self.x-=2
+			elif (val=='d' and self.x<terminalSize()[0]):
+						self.x+=2
+			self.gravity(val)
+
 
 
 class flyingObject():
@@ -160,6 +185,7 @@ class flyingObject():
 		self.y=y
 
 	def moveAcross(self):
+
 		if self.x<terminalSize()[0] and self.x!=-1:
 			self.x+=2
 		else:
@@ -285,6 +311,13 @@ def mainGame():
 	rightBeamList=[]
 	timeLeft=120
 	score=0
+	spBoost=None
+	shieldBoost=None
+	boostRandomiser=np.arange(0,120, 0.2)
+	spBoostTime=np.random.choice(boostRandomiser)
+	spBoostEnd=spBoostTime-20
+	shieldTime=np.random.choice(boostRandomiser)
+	shieldEnd=shieldTime-20
 	Din= dinObject()
 	while True:
 			time.sleep(0.02)
@@ -292,6 +325,20 @@ def mainGame():
 			background(score,timeLeft)
 			if timeLeft<=0:
 				break
+		
+			if (timeLeft <= spBoostTime and timeLeft>=spBoostEnd and spBoost==None):
+				spBoost=speedBoost()
+				
+			if spBoost!=None:
+				spBoost.renderObject()
+
+			if (timeLeft <= shieldTime and timeLeft>=shieldEnd and shield==None):
+				shieldBoost=shield()
+				
+			if shieldBoost!=None:
+				shieldBoost.renderObject()
+
+
 			Din.renderObject()
 
 			prob=np.random.random_sample()
@@ -299,6 +346,10 @@ def mainGame():
 			if(prob>=0.90):
 				coin=bgCoin()
 				coinList.append(coin)
+
+			prob=np.random.random_sample()
+
+
 
 			prob=np.random.random_sample()
 
@@ -324,7 +375,7 @@ def mainGame():
 
 			for i in range(len(coinList)):
 				coinList[i].renderObject()
-				
+			
 
 			for i in range(len(bulletList)):
 				bulletList[i].renderObject()
