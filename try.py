@@ -174,11 +174,71 @@ class flyingObject():
 			print ('\033['+ str(self.y) +';' + str(self.x) + 'H >')
 
 
+
+class bgBeams(bgObject):
+	
+	def __init__(self):
+		self.sizeSide=2
+	
+		super().__init__()
+
+class vertBeam(bgBeams):
+	def __init__(self):
+		self.y=np.random.randint(7,terminalSize()[1]-5)
+
+		super().__init__()
+
+
+	def moveAcross(self):
+		if self.x>0:
+			self.x-=1
+		else:
+			self.x=-1
+
+
+	def renderObject(self):
+		self.moveAcross()
+		
+		if self.x!=-1:
+			self.j=self.y
+			for i in range(5):
+
+				print ('\033['+ str(self.j) +';' + str(self.x) + 'H 0')
+				self.j+=1
+
+
+class horiBeam(bgBeams):
+	def __init__(self):
+		self.y=np.random.randint(5,terminalSize()[1]-3)
+
+		super().__init__()
+
+
+	def moveAcross(self):
+		if self.x>5:
+			self.x-=1
+		else:
+			self.x=-1
+
+
+	def renderObject(self):
+		self.moveAcross()
+		
+		if self.x!=-1:
+			self.j=self.x-8
+			for i in range(5):
+				print ('\033['+ str(self.y) +';' + str(self.j) + 'H 00000')
+				self.j+=1
+
+
+
 def mainGame():
 	
 	gravCount=0
 	coinList=[]
 	bulletList=[]
+	vertBeamList=[]
+	horiBeamList=[]
 	Din= dinObject()
 
 	while True:
@@ -187,11 +247,22 @@ def mainGame():
 			
 			Din.renderObject()
 
-			prob=np.random.uniform()
+			prob=np.random.random_sample()
 
-			if(prob>=0.95):
+			if(prob>=0.90):
 				coin=bgCoin()
 				coinList.append(coin)
+
+			prob=np.random.random_sample()
+
+			if(prob>=0.95):
+				beam=vertBeam()
+				vertBeamList.append(beam)
+
+			prob=np.random.random_sample()
+			if(prob>=0.95):
+				beam=horiBeam()
+				horiBeamList.append(beam)
 
 			for i in range(len(coinList)):
 				coinList[i].renderObject()
@@ -201,13 +272,17 @@ def mainGame():
 				bulletList[i].renderObject()
 				
 
+			for i in range(len(vertBeamList)):
+				vertBeamList[i].renderObject()
 
+			for i in range(len(horiBeamList)):
+				horiBeamList[i].renderObject()
 
 
 			val=inputChar()
 
 			
-			if (val=='c'):
+			if (val=='q'):
 				break
 			elif (val=='b'):
 				x,y=Din.getXY()
