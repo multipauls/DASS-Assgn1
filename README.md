@@ -6,7 +6,6 @@
 	- bullets
 	- boost
 	- shield
-- precision equal to
 - enemy
 - magnet
 - colour
