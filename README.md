@@ -13,6 +13,7 @@
 - split files
 
 ## DONE
+- linting(ish)
 - spawn
 - move
 - bullets

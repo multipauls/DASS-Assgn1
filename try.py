@@ -1,22 +1,20 @@
 from __future__ import print_function
-import time, signal
-import fcntl, termios, struct
+import time
+import tty
+import sys
+import signal
+import fcntl
+import termios
+import struct
 import numpy as np
 
 #copied here
 class _getChUnix:
     '''class to take input'''
 
-    def __init__(self):
-        '''init def to take input'''
-        import tty
-        import sys
-
     def __call__(self):
         '''def to call function'''
-        import sys
-        import tty
-        import termios
+
         fedvar = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fedvar)
         try:
@@ -112,7 +110,6 @@ class shield(bgObject):
 
 class bgCoin(bgObject):
     def __init__(self):
-        
         super().__init__()
 
     def renderObject(self):
@@ -138,13 +135,10 @@ class magnetObject(bgObject):
 class charObject:
     def __init__(self):
         self.y = terminalSize()[1]-2
-        self.x = 7        
+        self.x = 7
 
     def renderObject(self):
-        print('\033['+ str(self.y) +';' + str(self.x) + 'H ' + str(self.x)+str(self.y)+' '+str(terminalSize()[1]))
-
-
-
+        print('\033['+str(self.y)+';'+str(self.x)+'H '+str(self.x)+str(self.y)+' '+str(terminalSize()[1]))
 
 
 
@@ -173,7 +167,7 @@ class dinObject(charObject):
             elif (val == 'd' and self.x < terminalSize()[0]):
                 self.x += 1
             self.gravity(val)
-         
+
         else:
             if (val == 'w') and self.y > 3:
                 self.y -= 2
@@ -188,7 +182,7 @@ class dinObject(charObject):
 
 class flyingObject():
     def __init__(self, x, y):
-        self.x = x    
+        self.x = x
         self.y = y
 
     def moveAcross(self):
@@ -209,10 +203,10 @@ class flyingObject():
 
 
 class bgBeams(bgObject):
-    
+
     def __init__(self):
         self.sizeSide = 2
-    
+
         super().__init__()
 
 class vertBeam(bgBeams):
@@ -230,7 +224,7 @@ class vertBeam(bgBeams):
 
     def renderObject(self):
         self.moveAcross()
-        
+
         if self.x != -1:
             self.j = self.y-2
             for i in range(5):
@@ -240,7 +234,7 @@ class vertBeam(bgBeams):
 
 class horiBeam(bgBeams):
     def __init__(self):
-        self.y = np.random.randint(5,terminalSize()[1]-3)
+        self.y = np.random.randint(5, terminalSize()[1]-3)
         super().__init__()
 
 
@@ -253,7 +247,7 @@ class horiBeam(bgBeams):
 
     def renderObject(self):
         self.moveAcross()
-        
+
         if self.x != -1:
             self.j = self.x-8
             for i in range(5):
@@ -277,7 +271,7 @@ class diagLeftBeam(diagBeam):
 
     def renderObject(self):
         self.moveAcross()
-        
+
         if self.x != -1:
             self.j = self.x-8
             self.k = self.y-2
@@ -292,7 +286,7 @@ class diagRightBeam(diagBeam):
 
     def renderObject(self):
         self.moveAcross()
-        
+
         if self.x != -1:
             self.j = self.x-8
             self.k = self.y-2
@@ -303,11 +297,8 @@ class diagRightBeam(diagBeam):
 
 
 
-
-
-
 def mainGame():
-    
+
     gravCount = 0
     coinList = []
     bulletList = []
@@ -331,19 +322,18 @@ def mainGame():
         background(score, timeLeft)
         if timeLeft <= 0:
             break
-        
+
         if (timeLeft <= spBoostTime and timeLeft >= spBoostEnd and spBoost == None):
             spBoost = speedBoost()
-                
+
         if spBoost != None:
             spBoost.renderObject()
 
         if (timeLeft <= shieldTime and timeLeft >= shieldEnd and shield == None):
             shieldBoost = shield()
-                
+
         if shieldBoost != None:
             shieldBoost.renderObject()
-
 
         Din.renderObject()
 
@@ -355,16 +345,13 @@ def mainGame():
 
         prob = np.random.random_sample()
 
-
-
         prob = np.random.random_sample()
 
         if(prob >= 0.95):
-            beam=vertBeam()
+            beam = vertBeam()
             vertBeamList.append(beam)
 
         prob = np.random.random_sample()
-        
         if(prob >= 0.95):
             beam = horiBeam()
             horiBeamList.append(beam)
@@ -374,7 +361,6 @@ def mainGame():
             beam = diagLeftBeam()
             leftBeamList.append(beam)
 
-
         prob = np.random.random_sample()
         if(prob >= 0.95):
             beam = diagRightBeam()
@@ -382,11 +368,9 @@ def mainGame():
 
         for i in range(len(coinList)):
             coinList[i].renderObject()
-            
 
         for i in range(len(bulletList)):
             bulletList[i].renderObject()
-                
 
         for i in range(len(vertBeamList)):
             vertBeamList[i].renderObject()
@@ -400,20 +384,18 @@ def mainGame():
         for i in range(len(rightBeamList)):
             rightBeamList[i].renderObject()
 
-        val=inputChar()
+        val = inputChar()
 
-            
         if (val == 'q'):
             break
         elif (val == 'b'):
             x, y = Din.getXY()
             bullet = flyingObject(x, y)
             bulletList.append(bullet)
-            
+
         else:
             Din.moveDin(val)
-            
-            
+
 
 '''
     def magForce(self, flagVal, magX, magY):
