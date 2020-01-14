@@ -67,12 +67,12 @@ def terminalSize():
 def background(score, timeLeft):
     print('\033[0;0H')
     print(' '*terminalSize()[0])
-    print('\033[0;1H SCORE:'+str(score)+' TIME LEFT:'+str(timeLeft))
-    print('-'*terminalSize()[0])
+    print('\u001b[38;5;15m' + '-'*terminalSize()[0] + '\u001b[0m')
     for i in range(terminalSize()[1]-4):
-        print(' '*terminalSize()[0])
-    print('-'*terminalSize()[0])
-
+        #print('\u001b[48;5;110m' + ' '*terminalSize()[0] + '\u001b[0m')
+        print (' '*terminalSize()[0])
+    print('\u001b[38;5;70m' + '-'*terminalSize()[0] + '\u001b[0m')
+    print('\u001b[38;5;15m \033[0;1H SCORE:'+str(score)+' TIME LEFT:'+str(timeLeft)+ '\u001b[0m')
 
 
 
@@ -111,7 +111,7 @@ class bgCoin(bgObject):
     def renderObject(self):
         self.moveAcross()
         if self.x != -1:
-            print('\033['+ str(self.y) +';' + str(self.x)+'H O')
+            print('\u001b[38;5;214m \033['+ str(self.y) +';' + str(self.x)+'H O \u001b[0m')
 
 class magnetObject(bgObject):
     def __init__(self):
@@ -122,9 +122,7 @@ class magnetObject(bgObject):
     def renderObject(self):
         self.moveAcross()
         if self.x != -1:
-            print('\u001b[38;5;88m')
-            print('\033['+ str(self.y) +';' + str(self.x)+'H O')
-            print('\u001b[0m')
+            print('\u001b[38;5;88m \033['+ str(self.y) +';' + str(self.x)+'H Ո \u001b[0m')
 
 
 class dragonObject(bgObject):
@@ -133,23 +131,25 @@ class dragonObject(bgObject):
         self.x = terminalSize()[0]-15
         self.y = 5
     def renderObject(self, dinY):
-        f = open('try.txt', 'r')
-        if dinY > self.y+9:
-            self.y = dinY-9
+        f = open('dragon.txt', 'r')
+        if dinY > self.y+8:
+            self.y = dinY-8
         elif dinY < self.y:
             self.y = dinY
 
         self.j = self.y
+        print('\u001b[38;5;74m')
         for i in f:
             print('\033['+ str(self.j) +';' + str(self.x)+'H '+str(i))
             self.j += 1
+        print('\u001b[0m')
         f.close()
 
 class cloudObject(bgObject):
     def __init__(self):
         super().__init__()
         self.x = terminalSize()[0]-11
-        self.y = np.random.choice(range(3,8))
+        self.y = 3
     def moveAcross(self):
         if self.x > 5:
             self.x -= 1
@@ -160,20 +160,21 @@ class cloudObject(bgObject):
         f = open('cloud.txt', 'r')
         self.moveAcross()
         self.j = self.y
-
         for i in f:
-            print('\033['+ str(self.j) +';' + str(self.x)+'H '+str(i))
+            print('\u001b[38;5;194m \033['+ str(self.j) +';' + str(self.x)+'H '+str(i)+ ' \u001b[0m')
             self.j += 1
         f.close()
 
 
 class charObject:
     def __init__(self):
-        self.y = terminalSize()[1]-2
+        self.y = terminalSize()[1]-3
         self.x = 7
 
     def renderObject(self):
-        print('\033['+str(self.y)+';'+str(self.x)+'H '+str(self.x)+str(self.y)+' '+str(terminalSize()[1]))
+        print('\u001b[38;5;223m \033['+str(self.y)+';'+str(self.x)+'H O \u001b[0m')
+        print('\u001b[38;5;58m \033['+str(self.y+1)+';'+str(self.x)+'H K \u001b[0m')
+        #+str(self.x)+str(self.y)+' '+str(terminalSize()[1]))
 
 
 
@@ -184,11 +185,10 @@ class dinObject(charObject):
         self.magAttract = 0
         super().__init__()
 
-    def gravity(self, val):#, gravCount):
-        if val != 'w' and self.y < terminalSize()[1]-2: #and gravCount==1:
+    def gravity(self, val):
+        if val != 'w' and self.y < terminalSize()[1]-3: 
             self.y += 1
-        #gravCount= not(gravCount)
-        return self.y#, gravCount
+        return self.y
 
     def getXY(self):
         return self.x, self.y
@@ -248,11 +248,9 @@ class flyingObject():
     def renderObject(self):
         self.moveAcross()
         if self.x != -1:
-            print('\033[' + str(self.y) +';' + str(self.x) + 'H >')
+            print('\u001b[38;5;196m \033[' + str(self.y) +';' + str(self.x) + 'H > \u001b[0m')
 
 class enBulletObject(flyingObject):
-
-
 
     def moveAcross(self):
 
@@ -264,7 +262,7 @@ class enBulletObject(flyingObject):
     def renderObject(self):
         self.moveAcross()
         if self.x != -1:
-            print('\033[' + str(self.y) +';' + str(self.x) + 'H <')
+            print('\u001b[38;5;14m \033[' + str(self.y) +';' + str(self.x) + 'H < \u001b[0m')
 
 
 
@@ -295,7 +293,7 @@ class vertBeam(bgBeams):
         if self.x != -1:
             self.j = self.y-2
             for i in range(5):
-                print('\033['+ str(self.j) +';' + str(self.x) + 'H 0')
+                print('\u001b[38;5;228m \033['+ str(self.j) +';' + str(self.x) + 'H 0 \u001b[0m')
                 self.j += 1
 
 
@@ -318,7 +316,7 @@ class horiBeam(bgBeams):
         if self.x != -1:
             self.j = self.x-8
             for i in range(5):
-                print('\033['+ str(self.y) +';' + str(self.j) + 'H 0')
+                print('\u001b[38;5;228m \033['+ str(self.y) +';' + str(self.j) + 'H 0 \u001b[0m')
                 self.j += 2
 
 class diagBeam(bgBeams):
@@ -342,11 +340,12 @@ class diagLeftBeam(diagBeam):
         if self.x != -1:
             self.j = self.x-8
             self.k = self.y-2
+            
             for i in range(5):
-                print('\033['+ str(self.k) +';' + str(self.j) + 'H 0')
+                print('\u001b[38;5;209m \033['+ str(self.k) +';' + str(self.j) + 'H 0 \u001b[0m')
                 self.j += 2
                 self.k += 1
-
+            
 class diagRightBeam(diagBeam):
     def __init__(self):
         super().__init__()
@@ -357,10 +356,12 @@ class diagRightBeam(diagBeam):
         if self.x != -1:
             self.j = self.x-8
             self.k = self.y-2
+            print('\u001b[38;5;209m')
             for i in range(5):
-                print('\033['+ str(self.k) +';' + str(self.j) + 'H 0')
+                print('\u001b[38;5;209m \033['+ str(self.k) +';' + str(self.j) + 'H 0 \u001b[0m')                
                 self.j -= 2
                 self.k += 1
+            print('\u001b[0m')
 
 
 
@@ -391,7 +392,37 @@ def mainGame():
         time.sleep(0.02)
         timeLeft -= 0.2
         background(score, timeLeft)
+        for i in range(len(coinList)):
+            coinList[i].renderObject()
+
+        for i in range(len(bulletList)):
+            bulletList[i].renderObject()
+
+        for i in range(len(vertBeamList)):
+            vertBeamList[i].renderObject()
+
+        for i in range(len(horiBeamList)):
+            horiBeamList[i].renderObject()
+
+        for i in range(len(leftBeamList)):
+            leftBeamList[i].renderObject()
+            
+        for i in range(len(rightBeamList)):
+            rightBeamList[i].renderObject()
+
+        for i in range(len(cloudList)):
+            cloudList[i].renderObject()
+
+        if (timeLeft <= magTime and magnet == None):
+            magnet = magnetObject()
+            magnetFlag=1
+
+        elif magnet != None and magnet.getXY()[0] > -1:
+            magnet.renderObject()
         
+        else:
+            magnetFlag=0
+
 
         if timeLeft <= 0:
             break
@@ -423,15 +454,7 @@ def mainGame():
 
             
 
-            if (timeLeft <= magTime and magnet == None):
-                magnet = magnetObject()
-                magnetFlag=1
-
-            elif magnet != None and magnet.getXY()[0] > -1:
-                magnet.renderObject()
-        
-            else:
-                magnetFlag=0
+            
             
             prob = np.random.random_sample()
             if(prob >= 0.99):
@@ -465,26 +488,6 @@ def mainGame():
                 beam = diagRightBeam()
                 rightBeamList.append(beam)
             
-            for i in range(len(coinList)):
-                coinList[i].renderObject()
-
-            for i in range(len(bulletList)):
-                bulletList[i].renderObject()
-
-            for i in range(len(vertBeamList)):
-                vertBeamList[i].renderObject()
-
-            for i in range(len(horiBeamList)):
-                horiBeamList[i].renderObject()
-
-            for i in range(len(leftBeamList)):
-                leftBeamList[i].renderObject()
-            
-            for i in range(len(rightBeamList)):
-                rightBeamList[i].renderObject()
-
-            for i in range(len(cloudList)):
-                cloudList[i].renderObject()
 
         
         Din.renderObject()

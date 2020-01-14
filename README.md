@@ -7,12 +7,17 @@
 	- enemy bullets
 	- boost
 	- shield
-- colour
+- bag colour
 - split files
 - bugfixing
+	- magnet
+	- clouds
+	- dragon
+- end game
 
 ## DONE
 - linting(ish)
+- foreground colour
 - clouds (bg)
 - enemy
 - magnet
