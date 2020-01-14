@@ -4,16 +4,18 @@
 	- coins
 	- beams
 	- bullets
+	- enemy bullets
 	- boost
 	- shield
-- enemy
-- magnet
 - colour
-
 - split files
+- bugfixing
 
 ## DONE
 - linting(ish)
+- clouds (bg)
+- enemy
+- magnet
 - spawn
 - move
 - bullets

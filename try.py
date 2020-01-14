@@ -24,10 +24,6 @@ class _getChUnix:
             termios.tcsetattr(fedvar, termios.TCSADRAIN, old_settings)
         return charvar
 
-
-
-
-
 class AlarmException(Exception):
     '''This class executes the alarmexception.'''
     pass
@@ -71,7 +67,7 @@ def terminalSize():
 def background(score, timeLeft):
     print('\033[0;0H')
     print(' '*terminalSize()[0])
-    print('\033[0;0H SCORE:'+str(score)+' TIME LEFT:'+str(timeLeft))
+    print('\033[0;1H SCORE:'+str(score)+' TIME LEFT:'+str(timeLeft))
     print('-'*terminalSize()[0])
     for i in range(terminalSize()[1]-4):
         print(' '*terminalSize()[0])
@@ -126,10 +122,49 @@ class magnetObject(bgObject):
     def renderObject(self):
         self.moveAcross()
         if self.x != -1:
+            print('\u001b[38;5;88m')
             print('\033['+ str(self.y) +';' + str(self.x)+'H O')
+            print('\u001b[0m')
 
 
+class dragonObject(bgObject):
+    def __init__(self):
+        super().__init__()
+        self.x = terminalSize()[0]-15
+        self.y = 5
+    def renderObject(self, dinY):
+        f = open('try.txt', 'r')
+        if dinY > self.y+9:
+            self.y = dinY-9
+        elif dinY < self.y:
+            self.y = dinY
 
+        self.j = self.y
+        for i in f:
+            print('\033['+ str(self.j) +';' + str(self.x)+'H '+str(i))
+            self.j += 1
+        f.close()
+
+class cloudObject(bgObject):
+    def __init__(self):
+        super().__init__()
+        self.x = terminalSize()[0]-11
+        self.y = np.random.choice(range(3,8))
+    def moveAcross(self):
+        if self.x > 5:
+            self.x -= 1
+        else:
+            self.x = -1
+
+    def renderObject(self):
+        f = open('cloud.txt', 'r')
+        self.moveAcross()
+        self.j = self.y
+
+        for i in f:
+            print('\033['+ str(self.j) +';' + str(self.x)+'H '+str(i))
+            self.j += 1
+        f.close()
 
 
 class charObject:
@@ -158,25 +193,40 @@ class dinObject(charObject):
     def getXY(self):
         return self.x, self.y
 
-    def moveDin(self, val):
+    def magForce(self, flagVal, magX):
+        if flagVal==1:
+            if self.x>magX:
+                self.x-=1
+
+            elif self.x<magX:
+                self.x+=1
+
+
+    def moveDin(self, speedVal, magnetFlag, magX):
         if self.speedBoost == 0:
-            if (val == 'w') and self.y > 3:
+            if (speedVal == 'w') and self.y > 3:
                 self.y -= 1
-            elif (val == 'a' and self.x > 0):
+            elif (speedVal == 'a' and self.x > 0):
                 self.x -= 1
-            elif (val == 'd' and self.x < terminalSize()[0]):
+            elif (speedVal == 'd' and self.x < terminalSize()[0]):
                 self.x += 1
-            self.gravity(val)
+            else:
+                self.magForce(magnetFlag, magX)
+            self.gravity(speedVal)
 
         else:
-            if (val == 'w') and self.y > 3:
+            if (speedVal == 'w') and self.y > 3:
                 self.y -= 2
-            elif (val == 'a' and self.x > 0):
+            elif (speedVal == 'a' and self.x > 0):
                 self.x -= 2
-            elif (val == 'd' and self.x < terminalSize()[0]):
+            elif (speedVal == 'd' and self.x < terminalSize()[0]):
                 self.x += 2
-            self.gravity(val)
+            else:
+                self.magForce(magnetFlag, magX)
+            self.gravity(speedVal)
 
+
+    
 
 
 
@@ -199,6 +249,23 @@ class flyingObject():
         self.moveAcross()
         if self.x != -1:
             print('\033[' + str(self.y) +';' + str(self.x) + 'H >')
+
+class enBulletObject(flyingObject):
+
+
+
+    def moveAcross(self):
+
+        if self.x < terminalSize()[0] and self.x != -1:
+            self.x -= 2
+        else:
+            self.x = -1
+
+    def renderObject(self):
+        self.moveAcross()
+        if self.x != -1:
+            print('\033[' + str(self.y) +';' + str(self.x) + 'H <')
+
 
 
 
@@ -302,88 +369,125 @@ def mainGame():
     gravCount = 0
     coinList = []
     bulletList = []
+    enBulletList = []
     vertBeamList = []
     horiBeamList = []
     leftBeamList = []
     rightBeamList = []
-    timeLeft = 120
+    cloudList=[]
+    timeLeft = 20
     score = 0
     spBoost = None
     shieldBoost = None
-    boostRandomiser = np.arange(0, 120, 0.2)
+    magnet=None
+    magnetFlag=0
+    boostRandomiser = np.arange(0, 100, 0.2)
     spBoostTime = np.random.choice(boostRandomiser)
-    spBoostEnd = spBoostTime-20
     shieldTime = np.random.choice(boostRandomiser)
-    shieldEnd = shieldTime-20
+    magTime = np.random.choice(boostRandomiser)
     Din = dinObject()
+    dragon=dragonObject()
     while True:
         time.sleep(0.02)
         timeLeft -= 0.2
         background(score, timeLeft)
+        
+
         if timeLeft <= 0:
             break
 
-        if (timeLeft <= spBoostTime and timeLeft >= spBoostEnd and spBoost == None):
-            spBoost = speedBoost()
 
-        if spBoost != None:
-            spBoost.renderObject()
 
-        if (timeLeft <= shieldTime and timeLeft >= shieldEnd and shield == None):
-            shieldBoost = shield()
+        elif timeLeft <= 10:
+            DinY=Din.getXY()[1]
+            dragon.renderObject(DinY)
+            if timeLeft%1 <= 0.001:
+                enBullet=enBulletObject(terminalSize()[0]-11,DinY, )
+                enBulletList.append(enBullet)
+            for i in range(len(enBulletList)):
+                enBulletList[i].renderObject()
 
-        if shieldBoost != None:
-            shieldBoost.renderObject()
 
+        else:    
+            if (timeLeft <= spBoostTime and spBoost == None):
+                spBoost = speedBoost()
+
+            elif spBoost != None and spBoost.getXY()[0] > -1:
+                spBoost.renderObject()
+
+            if (timeLeft <= shieldTime and shield == None):
+                shieldBoost = shield()
+
+            elif shieldBoost != None and shieldBoost.getXY()[0] > -1:
+                shieldBoost.renderObject()
+
+            
+
+            if (timeLeft <= magTime and magnet == None):
+                magnet = magnetObject()
+                magnetFlag=1
+
+            elif magnet != None and magnet.getXY()[0] > -1:
+                magnet.renderObject()
+        
+            else:
+                magnetFlag=0
+            
+            prob = np.random.random_sample()
+            if(prob >= 0.99):
+                cloud = cloudObject()
+                cloudList.append(cloud)
+            
+
+            prob = np.random.random_sample()
+
+            if(prob >= 0.90):
+                coin = bgCoin()
+                coinList.append(coin)
+
+            prob = np.random.random_sample()
+            if(prob >= 0.95):
+                beam = vertBeam()
+                vertBeamList.append(beam)
+
+            prob = np.random.random_sample()
+            if(prob >= 0.95):
+                beam = horiBeam()
+                horiBeamList.append(beam)
+            
+            prob = np.random.random_sample()
+            if(prob >= 0.95):
+                beam = diagLeftBeam()
+                leftBeamList.append(beam)
+
+            prob = np.random.random_sample()
+            if(prob >= 0.95):
+                beam = diagRightBeam()
+                rightBeamList.append(beam)
+            
+            for i in range(len(coinList)):
+                coinList[i].renderObject()
+
+            for i in range(len(bulletList)):
+                bulletList[i].renderObject()
+
+            for i in range(len(vertBeamList)):
+                vertBeamList[i].renderObject()
+
+            for i in range(len(horiBeamList)):
+                horiBeamList[i].renderObject()
+
+            for i in range(len(leftBeamList)):
+                leftBeamList[i].renderObject()
+            
+            for i in range(len(rightBeamList)):
+                rightBeamList[i].renderObject()
+
+            for i in range(len(cloudList)):
+                cloudList[i].renderObject()
+
+        
         Din.renderObject()
-
-        prob = np.random.random_sample()
-
-        if(prob >= 0.90):
-            coin = bgCoin()
-            coinList.append(coin)
-
-        prob = np.random.random_sample()
-
-        prob = np.random.random_sample()
-
-        if(prob >= 0.95):
-            beam = vertBeam()
-            vertBeamList.append(beam)
-
-        prob = np.random.random_sample()
-        if(prob >= 0.95):
-            beam = horiBeam()
-            horiBeamList.append(beam)
-            
-        prob = np.random.random_sample()
-        if(prob >= 0.95):
-            beam = diagLeftBeam()
-            leftBeamList.append(beam)
-
-        prob = np.random.random_sample()
-        if(prob >= 0.95):
-            beam = diagRightBeam()
-            rightBeamList.append(beam)
-
-        for i in range(len(coinList)):
-            coinList[i].renderObject()
-
-        for i in range(len(bulletList)):
-            bulletList[i].renderObject()
-
-        for i in range(len(vertBeamList)):
-            vertBeamList[i].renderObject()
-
-        for i in range(len(horiBeamList)):
-            horiBeamList[i].renderObject()
-
-        for i in range(len(leftBeamList)):
-            leftBeamList[i].renderObject()
-            
-        for i in range(len(rightBeamList)):
-            rightBeamList[i].renderObject()
-
         val = inputChar()
 
         if (val == 'q'):
@@ -393,25 +497,11 @@ def mainGame():
             bullet = flyingObject(x, y)
             bulletList.append(bullet)
 
+        elif magnetFlag==1:
+            Din.moveDin(val,magnetFlag,magnet.getXY()[0])
+
         else:
-            Din.moveDin(val)
-
-
-'''
-    def magForce(self, flagVal, magX, magY):
-        if flagVal==1:
-            if self.y>magY && self.x>magX:
-                self.y-=1
-                self.x-=1
-
-            elif self.y>magY && self.x<magX
-                self.y-=1
-
-        return 
-''' 
+            Din.moveDin(val,magnetFlag,0)
 
 
 mainGame()
-
-
-
