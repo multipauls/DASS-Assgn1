@@ -28,6 +28,7 @@ class AlarmException(Exception):
     '''This class executes the alarmexception.'''
     pass
 
+
 #copied code begins here
 def inputChar():
     ''' moves Mario'''
@@ -64,7 +65,17 @@ def terminalSize():
     return w, h
 
 
-def background(score, timeLeft, life):
+def endGame(exitCode):
+    print(' '*terminalSize()[0]*terminalSize()[1])
+    if exitCode == 1:
+        print('\u001b[48;5;232m \u001b[38;5;15m \033[0;1H YOU WON \u001b[0m')
+    elif exitCode == 2:
+        print('\u001b[48;5;232m \u001b[38;5;15m \033[0;1H YOU LOST \u001b[0m')
+
+    else:
+        print('\u001b[48;5;232m \u001b[38;5;15m \033[0;1H ERROR. EXITED GAME. \u001b[0m')
+
+def background(score, timeLeft, life, dragonLife):
   #  print('\u001b[48;5;232m \033[0;0H')
     print(' '*terminalSize()[0])
     print('\u001b[48;5;232m\u001b[38;5;15m' + '-'*terminalSize()[0] + '\u001b[0m')
@@ -73,7 +84,7 @@ def background(score, timeLeft, life):
         #print ('\u001b[48;5;232m'+ ' '*terminalSize()[0])
     print('\u001b[48;5;232m\u001b[38;5;70m' + '-'*(terminalSize()[0]-2) + '\u001b[0m')
     print('\u001b[48;5;232m' + ' '*(terminalSize()[0]-1) + '\u001b[0m')
-    print('\u001b[48;5;232m \u001b[38;5;15m \033[0;1H SCORE:'+str(score)+' LIFE:'+ str(life)+' TIME LEFT:'+str(timeLeft)+  '\u001b[0m')
+    print('\u001b[48;5;232m \u001b[38;5;15m \033[0;1H SCORE:'+str(score)+' LIFE:'+ str(life)+ ' ENEMY:'+ str(dragonLife) +' TIME LEFT:'+str(timeLeft)+ '\u001b[0m')
 
 
 
@@ -140,16 +151,18 @@ class dragonObject(bgObject):
         super().__init__()
         self._x = terminalSize()[0]-15
         self._y = 5
+
     def renderObject(self, dinY):
         f = open('dragon.txt', 'r')
         if dinY > self._y+8:
             self._y = dinY-8
         elif dinY < self._y:
             self._y = dinY
-
+        self._coords=[]
         self._j = self._y
         print('\u001b[48;5;232m \u001b[38;5;74m')
         for i in f:
+            self._coords.append([self._x, self._j])
             print('\033['+ str(self._j) +';' + str(self._x)+'H '+str(i))
             self._j += 1
         print('\u001b[0m')
@@ -208,6 +221,15 @@ class dinObject(bgObject):
             elif self._x<magX:
                 self._x+=1
 
+    def speedUp(self):
+        self._speedBoost=1
+
+
+    def shieldUp(self):
+        self._shield=1
+
+    def getShield(self):
+        return self._shield
 
     def moveDin(self, speedVal, magnetFlag, magX):
         if self._speedBoost == 0:
@@ -267,9 +289,9 @@ class enBulletObject(flyingObject):
 
     def renderObject(self):
         self.moveAcross()
-        self._coords=[self._x, self._y]
+        self._coords=[[self._x, self._y], [self._x+1, self._y]]
         if self._x != -1:
-            print(' \u001b[48;5;232m \u001b[38;5;14m \033[' + str(self._y) +';' + str(self._x) + 'H * \u001b[0m')
+            print(' \u001b[48;5;232m \u001b[38;5;14m \033[' + str(self._y) +';' + str(self._x) + 'H <@ \u001b[0m')
 
 
 
@@ -383,10 +405,10 @@ class diagRightBeam(diagBeam):
             print('\u001b[0m')
 
 
-
+exitCode = -1
 def mainGame():
 
-    gravCount = 0
+    global exitCode    
     coinList = []
     bulletList = []
     enBulletList = []
@@ -408,11 +430,13 @@ def mainGame():
     magTime = np.random.choice(boostRandomiser)
     Din = dinObject()
     dragon=dragonObject()
+    dragonLife=100
     while True:
         time.sleep(0.01)
         timeLeft -= 0.2
         DinPos=Din.getCoords()
-        background(score, timeLeft, life)
+        dragonPos= dragon.getCoords()
+        background(score, timeLeft, life, dragonLife)
         for i in range(len(coinList)):
             coinList[i].renderObject()
             coinPos=coinList[i].getCoords()
@@ -422,8 +446,16 @@ def mainGame():
                     score += 20
 
 
-#        for i in range(len(bulletList)):
-#            bulletList[i].renderObject()
+        for i in range(len(bulletList)):
+            bulletList[i].renderObject()
+            bulletPos=bulletList[i].getCoords()
+            for j in range(len(dragonPos)):
+                if bulletPos == dragonPos[j]:
+                    bulletList[i].changeX()
+                    
+                    dragonLife -= 10
+                    break
+
 
         for i in range(len(vertBeamList)):
             vertBeamList[i].renderObject()
@@ -432,8 +464,16 @@ def mainGame():
                 if DinPos[0] == vertPos[j] or DinPos[1] == vertPos[j]:
                     vertBeamList[i].changeX()
                     
-                    life -= 2
+                    if not(Din.getShield()):
+                        life -= 2                    
                     break
+                for k in range(len(bulletList)):
+                    bulletPos=bulletList[k].getCoords()
+                    if bulletPos == vertPos[j]:
+                        bulletList[k].changeX()
+                        vertBeamList[i].changeX()
+                        break
+                    
 
         for i in range(len(horiBeamList)):
             horiBeamList[i].renderObject()
@@ -441,9 +481,15 @@ def mainGame():
             for j in range(len(horiPos)):
                 if DinPos[0] == horiPos[j] or DinPos[1] == horiPos[j]:
                     horiBeamList[i].changeX()
-                    
-                    life -= 2
+                    if not(Din.getShield()):
+                        life -= 2
                     break
+                for k in range(len(bulletList)):
+                    bulletPos=bulletList[k].getCoords()
+                    if bulletPos == horiPos[j]:
+                        bulletList[k].changeX()
+                        horiBeamList[i].changeX()
+                        break
 
         for i in range(len(leftBeamList)):
             leftBeamList[i].renderObject()
@@ -451,9 +497,15 @@ def mainGame():
             for j in range(len(leftPos)):
                 if DinPos[0] == leftPos[j] or DinPos[1] == leftPos[j]:
                     leftBeamList[i].changeX()
-                    
-                    life -= 2
+                    if not(Din.getShield()):
+                        life -= 2
                     break
+                for k in range(len(bulletList)):
+                    bulletPos=bulletList[k].getCoords()
+                    if bulletPos == leftPos[j]:
+                        bulletList[k].changeX()
+                        leftBeamList[i].changeX()
+                        break
            
         for i in range(len(rightBeamList)):
             rightBeamList[i].renderObject()
@@ -462,14 +514,25 @@ def mainGame():
                 if DinPos[0] == rightPos[j] or DinPos[1] == rightPos[j]:
                     rightBeamList[i].changeX()
                     
-                    life -= 2
+                    if not(Din.getShield()):
+                        life -= 2
                     break
+                for k in range(len(bulletList)):
+                    bulletPos=bulletList[k].getCoords()
+                    if bulletPos == rightPos[j]:
+                        bulletList[k].changeX()
+                        rightBeamList[i].changeX()
+                        break
 
 #        for i in range(len(cloudList)):
 #            cloudList[i].renderObject()
 
         if (life <= 0):
-            #endgame
+            exitCode = 2
+            break
+
+        if (dragonLife <= 0):
+            exitCode = 1
             break
 
         if (timeLeft <= magTime and magnet == None):
@@ -484,12 +547,12 @@ def mainGame():
 
 
         if timeLeft <= 0:
-            #endgame
+            exitCode = 2
             break
 
 
 
-        elif timeLeft <= 10:
+        elif timeLeft <= 20:
             DinY=Din.getXY()[1]
             dragon.renderObject(DinY)
             if timeLeft%1 <= 0.2:
@@ -497,6 +560,12 @@ def mainGame():
                 enBulletList.append(enBullet)
             for i in range(len(enBulletList)):
                 enBulletList[i].renderObject()
+                enBulletPos=enBulletList[i].getCoords()
+                for j in range(len(enBulletPos)):
+                    if DinPos[0] == enBulletPos[j] or DinPos[1] == enBulletPos[j]:
+                        enBulletList[i].changeX()
+                        life -= 20
+                        break
 
 
         else:    
@@ -505,13 +574,20 @@ def mainGame():
 
             elif spBoost != None and spBoost.getXY()[0] > -1:
                 spBoost.renderObject()
+                spPos=spBoost.getCoords()
+                if spPos==DinPos[0] or spPos==DinPos[1]:
+                    Din.speedUp()
+                    spBoost.changeX()
 
             if (timeLeft <= shieldTime and shield == None):
                 shieldBoost = shield()
 
             elif shieldBoost != None and shieldBoost.getXY()[0] > -1:
                 shieldBoost.renderObject()
-
+                shieldPos = shieldBoost.getCoords()
+                if shieldPos==DinPos[0] or shieldPos==DinPos[1]:
+                    Din.shieldUp()
+                    shieldBoost.changeX()
             
 
             
@@ -568,3 +644,4 @@ def mainGame():
 
 
 mainGame()
+endGame(exitCode)

@@ -1,5 +1,14 @@
 # DASS Assignment 1
 ## TODO
+- redo shield 
+- split files
+- bugfixing
+	- magnet
+	- clouds
+	- bg 
+
+
+## DONE
 - collisions
 	- coins
 	- beams
@@ -7,16 +16,7 @@
 	- enemy bullets
 	- boost
 	- shield
-- split files
-- bugfixing
-	- magnet
-	- clouds
-	- dragon
 - end game
-
-## DONE
-- collisions
-	- coins
 - linting(ish)
 - foreground colour
 - protected variables
