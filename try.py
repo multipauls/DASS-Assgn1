@@ -435,14 +435,35 @@ def mainGame():
                     life -= 2
                     break
 
-#        for i in range(len(horiBeamList)):
-#            horiBeamList[i].renderObject()
+        for i in range(len(horiBeamList)):
+            horiBeamList[i].renderObject()
+            horiPos=horiBeamList[i].getCoords()
+            for j in range(len(horiPos)):
+                if DinPos[0] == horiPos[j] or DinPos[1] == horiPos[j]:
+                    horiBeamList[i].changeX()
+                    
+                    life -= 2
+                    break
 
-#        for i in range(len(leftBeamList)):
-#            leftBeamList[i].renderObject()
+        for i in range(len(leftBeamList)):
+            leftBeamList[i].renderObject()
+            leftPos=leftBeamList[i].getCoords()
+            for j in range(len(leftPos)):
+                if DinPos[0] == leftPos[j] or DinPos[1] == leftPos[j]:
+                    leftBeamList[i].changeX()
+                    
+                    life -= 2
+                    break
            
-#        for i in range(len(rightBeamList)):
-#            rightBeamList[i].renderObject()
+        for i in range(len(rightBeamList)):
+            rightBeamList[i].renderObject()
+            rightPos=rightBeamList[i].getCoords()
+            for j in range(len(rightPos)):
+                if DinPos[0] == rightPos[j] or DinPos[1] == rightPos[j]:
+                    rightBeamList[i].changeX()
+                    
+                    life -= 2
+                    break
 
 #        for i in range(len(cloudList)):
 #            cloudList[i].renderObject()
@@ -471,7 +492,7 @@ def mainGame():
         elif timeLeft <= 10:
             DinY=Din.getXY()[1]
             dragon.renderObject(DinY)
-            if timeLeft%1 <= 0.1:
+            if timeLeft%1 <= 0.2:
                 enBullet=enBulletObject(terminalSize()[0]-11,DinY)
                 enBulletList.append(enBullet)
             for i in range(len(enBulletList)):
