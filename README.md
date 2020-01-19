@@ -7,7 +7,6 @@
 	- enemy bullets
 	- boost
 	- shield
-- bag colour
 - split files
 - bugfixing
 	- magnet
@@ -16,8 +15,12 @@
 - end game
 
 ## DONE
+- collisions
+	- coins
 - linting(ish)
 - foreground colour
+- protected variables
+- bg colour
 - clouds (bg)
 - enemy
 - magnet
