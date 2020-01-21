@@ -1,12 +1,10 @@
 import tty
 import sys
 import signal
-import fcntl
 import termios
-import struct
 
 class _getChUnix:
-
+    ''' Class to get char input'''
     def __call__(self):
 
         fedvar = sys.stdin.fileno()
@@ -19,14 +17,18 @@ class _getChUnix:
         return charvar
 
 class AlarmException(Exception):
+    ''' Class for alarm exceptions ''' 
     pass
 
 
 def inputChar(timeout):
+    ''' Function for input '''
     def alarmHandler(signum, frame):
+        ''' Alarm handler for input '''
         raise AlarmException
 
     def userInput(timeout):
+        ''' Function that takes and returns the input '''
         signal.signal(signal.SIGALRM, alarmHandler)
         signal.setitimer(signal.ITIMER_REAL, timeout)
 

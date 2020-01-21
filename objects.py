@@ -1,43 +1,43 @@
 from __future__ import print_function
 import time
-from termSize import terminalSize
 import numpy as np
+from termSize import terminalSize
+
 
 class bgObject:
+    ''' General class for objects in the game'''
     def __init__(self):
         self._y = np.random.randint(5, terminalSize()[1]-3)
         self._x = terminalSize()[0]-1
         self._coords = []
     def getCoords(self):
+        ''' Gets coodinates of object '''
         return self._coords
+    
     def getXY(self):
         return self._x, self._y
    
     def changeX(self):
+        ''' Changes X coodinates of object (make it disappear) '''
         self._x = -1
 
     def moveAcross(self):
+        ''' Moves object across screen '''
         if self._x > 0:
             self._x -= 1
         else:
             self._x = -1
 
 class speedBoost(bgObject):
+    ''' Class for speed boost '''
     def renderObject(self):
         self.moveAcross()
         self._coords=[self._x,self._y]
         if self._x != -1:
             print('\u001b[48;5;232m \033['+ str(self._y) +';' + str(self._x)+'H X')
 
-class shield(bgObject):
-    def renderObject(self):
-        self.moveAcross()
-        self._coords=[self._x,self._y]
-        if self._x != -1:
-            print('\u001b[48;5;232m \033['+ str(self._y) +';' + str(self._x)+'H C \u001b[0m')
-
-
 class bgCoin(bgObject):
+    ''' Class for coins '''
     def __init__(self):
         super().__init__()
 
@@ -48,6 +48,7 @@ class bgCoin(bgObject):
             print('\u001b[48;5;232m \u001b[38;5;214m \033['+ str(self._y) +';' + str(self._x)+'H O \u001b[0m')
 
 class magnetObject(bgObject):
+    ''' Class for Magnet '''
     def __init__(self):
         super().__init__()
         self._y = 4
@@ -61,6 +62,7 @@ class magnetObject(bgObject):
 
 
 class dragonObject(bgObject):
+    ''' Class for final enemy '''
     def __init__(self):
         super().__init__()
         self._x = terminalSize()[0]-15
@@ -83,6 +85,7 @@ class dragonObject(bgObject):
         f.close()
 
 class cloudObject(bgObject):
+    ''' Class for clouds in the scenery '''
     def __init__(self):
         super().__init__()
         self._x = terminalSize()[0]-11
@@ -108,6 +111,7 @@ class cloudObject(bgObject):
 
 
 class dinObject(bgObject):
+    ''' Class for player character '''
     def __init__(self):
         super().__init__()
         self._y = terminalSize()[1]-3
@@ -126,11 +130,13 @@ class dinObject(bgObject):
             print('\u001b[48;5;232m \u001b[38;5;147m \033['+str(self._y+1)+';'+str(self._x)+'H K \u001b[0m')
 
     def gravity(self, val):
+        ''' Implements gravity for Din '''
         if val != 'w' and self._y < terminalSize()[1]-3: 
             self._y += 1
         return self._y
 
     def magForce(self, flagVal, magX):
+        ''' Implements magnetic force for Din '''
         if flagVal==1:
             if self._x>magX:
                 self._x-=1
@@ -139,16 +145,20 @@ class dinObject(bgObject):
                 self._x+=1
 
     def speedUp(self):
+        ''' Updates speedBoost flag'''
         self._speedBoost=1
 
 
     def shieldUp(self):
+        '''Updates shield flag '''
         self._shield=1
 
     def getShield(self):
+        ''' Returns shield flag '''
         return self._shield
 
     def moveDin(self, speedVal, magnetFlag, magX):
+        ''' Moves Din '''
         if self._speedBoost == 0:
             if (speedVal == 'w') and self._y > 3:
                 self._y -= 1
@@ -181,6 +191,7 @@ class dinObject(bgObject):
 
 
 class flyingObject(bgObject):
+    ''' Class for objects like bullets '''
     def __init__(self, x, y):
         super().__init__()
         self._x = x
@@ -200,6 +211,7 @@ class flyingObject(bgObject):
             print('\u001b[48;5;232m \u001b[38;5;196m \033[' + str(self._y) +';' + str(self._x) + 'H > \u001b[0m')
 
 class enBulletObject(flyingObject):
+    ''' Class for enemy bullets '''
 
     def moveAcross(self):
 
@@ -218,7 +230,7 @@ class enBulletObject(flyingObject):
 
 
 class bgBeams(bgObject):
-
+    ''' Class for beams '''
     def __init__(self):
 
         super().__init__()
@@ -228,6 +240,8 @@ class bgBeams(bgObject):
             self._coords[i][0]=-1
 
 class vertBeam(bgBeams):
+    ''' Class for vertical beams '''
+
     def __init__(self):
         super().__init__()
         self._y = np.random.randint(5, terminalSize()[1]-3)
@@ -254,6 +268,8 @@ class vertBeam(bgBeams):
 
 
 class horiBeam(bgBeams):
+    ''' Class for horizontal beams '''
+
     def __init__(self):
         self._y = np.random.randint(5, terminalSize()[1]-3)
         super().__init__()
@@ -278,6 +294,8 @@ class horiBeam(bgBeams):
                 self._j += 2
 
 class diagBeam(bgBeams):
+    ''' Class for diagonal beams '''
+
     def __init__(self):
         super().__init__()
         self._y = np.random.randint(5, terminalSize()[1]-3)
