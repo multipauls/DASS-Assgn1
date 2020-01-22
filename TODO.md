@@ -5,12 +5,6 @@
 	- regen
 
 
-- bugfixing
-	- magnet
-	- clouds
-	- bg 
-
-
 ## DONE
 - collisions
 	- coins
@@ -19,6 +13,11 @@
 	- enemy bullets
 	- boost
 	- shield
+- bugfixing
+	- magnet
+	- clouds
+	- bg 
+	- beams
 - split files
 - end game
 - linting(ish)

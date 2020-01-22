@@ -19,21 +19,21 @@ class bgObject:
    
     def changeX(self):
         ''' Changes X coodinates of object (make it disappear) '''
-        self._x = -1
+        self._x = None
 
     def moveAcross(self):
         ''' Moves object across screen '''
-        if self._x > 0:
+        if self._x != None and self._x > 0:
             self._x -= 1
         else:
-            self._x = -1
+            self._x = None
 
 class speedBoost(bgObject):
     ''' Class for speed boost '''
     def renderObject(self):
         self.moveAcross()
         self._coords=[self._x,self._y]
-        if self._x != -1:
+        if self._x != None:
             print('\u001b[48;5;232m \033['+ str(self._y) +';' + str(self._x)+'H X')
 
 class bgCoin(bgObject):
@@ -44,7 +44,7 @@ class bgCoin(bgObject):
     def renderObject(self):
         self.moveAcross()
         self._coords=[self._x,self._y]
-        if self._x != -1:
+        if self._x != None:
             print('\u001b[48;5;232m \u001b[38;5;214m \033['+ str(self._y) +';' + str(self._x)+'H O \u001b[0m')
 
 class magnetObject(bgObject):
@@ -57,7 +57,7 @@ class magnetObject(bgObject):
     def renderObject(self):
         self.moveAcross()
         self._coords=[self._x,self._y]
-        if self._x != -1:
+        if self._x != None:
             print(' \u001b[48;5;232m \u001b[38;5;88m \033['+ str(self._y) +';' + str(self._x)+'H Ո \u001b[0m')
 
 
@@ -91,19 +91,20 @@ class cloudObject(bgObject):
         self._x = terminalSize()[0]-11
         self._y = 3
     def moveAcross(self):
-        if self._x > 11:
+        if self._x != None and self._x > 0 :
             self._x -= 1
         else:
-            self._x = -1
+            self._x = None
 
     def renderObject(self):
         f = open('cloud.txt', 'r')
         self.moveAcross()
         self._j = self._y
-        for i in f:
-            print('\u001b[48;5;232m \u001b[38;5;194m \033['+ str(self._j) +';' + str(self._x)+'H '+str(i)+ ' \u001b[0m')
-            self._j += 1
-        f.close()
+        if self._x != None:
+            for i in f:
+                print('\u001b[48;5;232m \u001b[38;5;194m \033['+ str(self._j) +';' + str(self._x)+'H '+str(i)+ ' \u001b[0m')
+                self._j += 1
+            f.close()
 
 
 
@@ -137,7 +138,7 @@ class dinObject(bgObject):
 
     def magForce(self, flagVal, magX):
         ''' Implements magnetic force for Din '''
-        if flagVal==1:
+        if flagVal==1 and magX != None:
             if self._x>magX:
                 self._x-=1
 
@@ -199,15 +200,15 @@ class flyingObject(bgObject):
         self._coords=[]
     def moveAcross(self):
 
-        if self._x < terminalSize()[0] and self._x != -1:
+        if self._x != None and self._x < terminalSize()[0] and self._x > 0:
             self._x += 2
         else:
-            self._x = -1
+            self._x = None
 
     def renderObject(self):
         self.moveAcross()
         self._coords=[self._x, self._y]
-        if self._x != -1:
+        if self._x != None:
             print('\u001b[48;5;232m \u001b[38;5;196m \033[' + str(self._y) +';' + str(self._x) + 'H > \u001b[0m')
 
 class enBulletObject(flyingObject):
@@ -215,15 +216,18 @@ class enBulletObject(flyingObject):
 
     def moveAcross(self):
 
-        if self._x < terminalSize()[0] and self._x != -1:
+        if self._x != None and self._x < terminalSize()[0] and self._x > 0:
             self._x -= 2
         else:
-            self._x = -1
+            self._x = None
 
     def renderObject(self):
         self.moveAcross()
-        self._coords=[[self._x, self._y], [self._x+1, self._y]]
-        if self._x != -1:
+        if self._x != None:
+            self._coords=[[self._x, self._y], [self._x+1, self._y]]
+        else:
+            self._coords=[[None, self._y], [None, self._y]]
+        if self._x != None:
             print(' \u001b[48;5;232m \u001b[38;5;14m \033[' + str(self._y) +';' + str(self._x) + 'H <@ \u001b[0m')
 
 
@@ -235,9 +239,9 @@ class bgBeams(bgObject):
 
         super().__init__()
     def changeX(self):
-        self._x = -1
+        self._x = None
         for i in range(len(self._coords)):
-            self._coords[i][0]=-1
+            self._coords[i][0]=None
 
 class vertBeam(bgBeams):
     ''' Class for vertical beams '''
@@ -248,17 +252,17 @@ class vertBeam(bgBeams):
 
 
     def moveAcross(self):
-        if self._x > 0:
+        if self._x != None and self._x > 0 :
             self._x -= 1
         else:
-            self._x = -1
+            self._x = None
 
 
     def renderObject(self):
         self.moveAcross()
 
 
-        if self._x != -1:
+        if self._x != None:
             self._j = self._y-2
 
             for i in range(5):
@@ -276,22 +280,23 @@ class horiBeam(bgBeams):
 
 
     def moveAcross(self):
-        if self._x > 5:
+        if self._x != None and self._x > 10:
             self._x -= 1
         else:
-            self._x = -1
+            self._x = None
 
 
     def renderObject(self):
         self.moveAcross()
 
-        if self._x != -1:
+        if self._x != None:
             self._j = self._x-8
             for i in range(5):
                 self._coords.append([self._j,self._y])
                 self._coords.append([self._j+1,self._y])
                 print('\u001b[48;5;232m \u001b[38;5;228m \033['+ str(self._y) +';' + str(self._j) + 'H 0 \u001b[0m')
                 self._j += 2
+
 
 class diagBeam(bgBeams):
     ''' Class for diagonal beams '''
@@ -301,46 +306,53 @@ class diagBeam(bgBeams):
         self._y = np.random.randint(5, terminalSize()[1]-3)
 
 
-    def moveAcross(self):
-        if self._x > 5:
-            self._x -= 1
-        else:
-            self._x = -1
 
 class diagLeftBeam(diagBeam):
     def __init__(self):
         super().__init__()
 
+
+    def moveAcross(self):
+        if self._x != None and self._x > 10:
+            self._x -= 1
+        else:
+            self._x = None
+
     def renderObject(self):
         self.moveAcross()
 
-        if self._x != -1:
+        if self._x != None:
             self._j = self._x-8
             self._k = self._y-2
             
             for i in range(5):
-                self._coords.append([self._j,self._k])
-                self._coords.append([self._j+1,self._k])
-                print('\u001b[48;5;232m \u001b[38;5;209m \033['+ str(self._k) +';' + str(self._j) + 'H 0 \u001b[0m')
+                self._coords.append([self._j, self._k])
+                self._coords.append([self._j+1, self._k])
+                print('\u001b[48;5;232m \u001b[38;5;209m \033['+ str(self._k)+';'+str(self._j)+'H 0 \u001b[0m')
                 self._j += 2
                 self._k += 1
             
 class diagRightBeam(diagBeam):
     def __init__(self):
         super().__init__()
+        self._j = self._x-8
+
+    def moveAcross(self):
+        if self._x != None and self._j > 0:
+            self._x -= 1
+        else:
+            self._x = None
 
     def renderObject(self):
         self.moveAcross()
 
-        if self._x != -1:
+        if self._x != None:
             self._j = self._x-8
             self._k = self._y-2
             for i in range(5):
-                self._coords.append([self._j,self._k])
-                self._coords.append([self._j-1,self._k])
+                self._coords.append([self._j, self._k])
+                self._coords.append([self._j-1, self._k])
                 print('\u001b[48;5;232m \u001b[38;5;209m \033['+ str(self._k) +';' + str(self._j) + 'H 0 \u001b[0m')                
                 self._j -= 2
                 self._k += 1
             print('\u001b[0m')
-
-

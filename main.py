@@ -22,14 +22,14 @@ def mainGame():
     leftBeamList = []
     rightBeamList = []
     cloudList = []
-    timeLeft = 60
+    timeLeft = 120
     life = 100
     spBoost = None
     shieldBoost = None
     magnet = None
     speedFlag = 0
     magnetFlag = 0
-    boostRandomiser = np.arange(20, 60, 1)
+    boostRandomiser = np.arange(25, 120, 1)
     spBoostTime = np.random.choice(boostRandomiser)
     shieldTime = np.random.choice(boostRandomiser)
     magTime = np.random.choice(boostRandomiser)
@@ -48,25 +48,16 @@ def mainGame():
         DinPos = Din.getCoords()
         dragonPos = dragon.getCoords()
         background(score, timeLeft, life, dragonLife)
+        
+        for i in range(len(cloudList)):
+            cloudList[i].renderObject()
+
         for i in range(len(coinList)):
             coinList[i].renderObject()
             coinPos = coinList[i].getCoords()
-            #print(DinPos[0], coinPos)
             if DinPos[0] == coinPos or DinPos[1] == coinPos:
                 coinList[i].changeX()
                 score += 20
-
-
-        for i in range(len(bulletList)):
-            bulletList[i].renderObject()
-            bulletPos = bulletList[i].getCoords()
-            for j in range(len(dragonPos)):
-                if bulletPos == dragonPos[j]:
-                    bulletList[i].changeX()
-                    dragonLife -= 10
-                    score += 30
-                    break
-
 
         for i in range(len(vertBeamList)):
             vertBeamList[i].renderObject()
@@ -132,8 +123,15 @@ def mainGame():
                         rightBeamList[i].changeX()
                         break
 
-#        for i in range(len(cloudList)):
-#            cloudList[i].renderObject()
+        for i in range(len(bulletList)):
+            bulletList[i].renderObject()
+            bulletPos = bulletList[i].getCoords()
+            for j in range(len(dragonPos)):
+                if bulletPos == dragonPos[j]:
+                    bulletList[i].changeX()
+                    dragonLife -= 10
+                    score += 30
+                    break
 
         if (life <= 0):
             exitCode = 2
@@ -147,7 +145,7 @@ def mainGame():
             magnet = magnetObject()
             magnetFlag = 1
 
-        elif magnet != None and magnet.getXY()[0] > -1:
+        elif magnet != None and magnet.getXY()[0] != None and magnet.getXY()[0] > 0:
             magnet.renderObject()
 
         else:
@@ -170,7 +168,7 @@ def mainGame():
                 for j in range(len(enBulletPos)):
                     if DinPos[0] == enBulletPos[j] or DinPos[1] == enBulletPos[j]:
                         enBulletList[i].changeX()
-                        if not(Din.getShield):
+                        if not(Din.getShield()):
                             life -= 20
                         break
 
@@ -178,7 +176,7 @@ def mainGame():
             if (timeLeft <= spBoostTime and spBoost == None):
                 spBoost = speedBoost()
 
-            elif spBoost != None and spBoost.getXY()[0] > -1:
+            elif spBoost != None and spBoost.getXY()[0] != None and spBoost.getXY()[0] > 0:
                 spBoost.renderObject()
                 spPos = spBoost.getCoords()
                 if spPos == DinPos[0] or spPos == DinPos[1]:
@@ -186,12 +184,12 @@ def mainGame():
                     spBoost.changeX()
             
 
-            '''
+            
             prob = np.random.random_sample()
             if(prob >= 0.99):
                 cloud = cloudObject()
                 cloudList.append(cloud)
-            '''
+            
 
             prob = np.random.random_sample()
             if(prob >= 0.90):
@@ -199,31 +197,31 @@ def mainGame():
                 coinList.append(coin)
 
             prob = np.random.random_sample()
-            if(prob >= 0.95):
+            if(prob >= 0.99):
                 beam = vertBeam()
                 vertBeamList.append(beam)
 
             prob = np.random.random_sample()
-            if(prob >= 0.95):
+            if(prob >= 0.99):
                 beam = horiBeam()
                 horiBeamList.append(beam)
 
             prob = np.random.random_sample()
-            if(prob >= 0.95):
+            if(prob >= 0.99):
                 beam = diagLeftBeam()
                 leftBeamList.append(beam)
 
             prob = np.random.random_sample()
-            if(prob >= 0.95):
+            if(prob >= 0.99):
                 beam = diagRightBeam()
                 rightBeamList.append(beam)
             
         
         Din.renderObject()
         if speedFlag == 1:
-            val = inputChar(0.1)
+            val = inputChar(0.05)
         else:
-            val =  inputChar(0.2)
+            val =  inputChar(0.1)
 
         if (val == 'q'):
             break
