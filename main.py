@@ -13,7 +13,8 @@ score = 0
 def mainGame():
     ''' The game loop '''
     global exitCode
-    global score    
+    global score
+    timeHere = time.time() 
     coinList = []
     bulletList = []
     enBulletList = []
@@ -23,6 +24,7 @@ def mainGame():
     rightBeamList = []
     cloudList = []
     timeLeft = 120
+    timeEnd = timeHere + 120
     life = 100
     spBoost = None
     shieldBoost = None
@@ -39,10 +41,10 @@ def mainGame():
     while True:
         if speedFlag == 1:
             time.sleep(0.01)
-            timeLeft -= 0.1
+            timeLeft = timeEnd - time.time()
         else:
             time.sleep(0.02)
-            timeLeft -= 0.2
+            timeLeft = timeEnd - time.time()
 
 
         DinPos = Din.getCoords()

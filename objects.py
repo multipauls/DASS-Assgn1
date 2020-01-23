@@ -154,6 +154,9 @@ class dinObject(bgObject):
         '''Updates shield flag '''
         self._shield=1
 
+    def shieldDown(self):
+        self._shield=0
+
     def getShield(self):
         ''' Returns shield flag '''
         return self._shield
