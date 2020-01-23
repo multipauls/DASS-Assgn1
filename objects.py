@@ -170,8 +170,6 @@ class dinObject(bgObject):
                 self._x -= 1
             elif (speedVal == 'd' and self._x < terminalSize()[0]):
                 self._x += 1
-            elif (speedVal == ' '):
-                self.shieldUp()
             else:
                 self.magForce(magnetFlag, magX)
             self.gravity(speedVal)
@@ -183,8 +181,6 @@ class dinObject(bgObject):
                 self._x -= 2
             elif (speedVal == 'd' and self._x < terminalSize()[0]):
                 self._x += 2
-            elif (speedVal == ' '):
-                self.shieldUp()
             else:
                 self.magForce(magnetFlag, magX)
             self.gravity(speedVal)

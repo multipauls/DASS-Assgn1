@@ -33,8 +33,9 @@ def mainGame():
     magnetFlag = 0
     boostRandomiser = np.arange(25, 120, 1)
     spBoostTime = np.random.choice(boostRandomiser)
-    shieldTime = np.random.choice(boostRandomiser)
     magTime = np.random.choice(boostRandomiser)
+    shieldEnd = 0
+    shieldRecharge = 0
     Din = dinObject()
     dragon = dragonObject()
     dragonLife = 100
@@ -218,13 +219,17 @@ def mainGame():
                 beam = diagRightBeam()
                 rightBeamList.append(beam)
             
-        
+        if (time.time() >= shieldEnd and Din.getShield() == 1):
+            Din.shieldDown()
+            shieldRecharge = time.time() + 60
         Din.renderObject()
         if speedFlag == 1:
             val = inputChar(0.05)
         else:
             val =  inputChar(0.1)
-
+        if (val == ' ' and time.time() > shieldRecharge):
+            Din.shieldUp()
+            shieldEnd = time.time() + 10
         if (val == 'q'):
             break
         elif (val == 'b'):

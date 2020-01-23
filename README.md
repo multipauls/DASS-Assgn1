@@ -10,7 +10,7 @@ You will be playing as Din, the Mandolorian, who has to fight his way through an
 - To move left and right relative to the screen, press A and D. If you stay still, the other objects will still move relative to you.
 - To activate the jetpack, press W. When you let go of the key, Din will fall down to the ground.
 - To shoot bullets and clear beams or enemies, press B.
-- To activate your shield, press S.
+- To activate your shield, press S. Your shield only lasts for 10 seconds at a time and needs 60 seconds to recharge.
 
 ### Collectibles:
 - Coins appear randomly on the screen. Collect to increase your score.

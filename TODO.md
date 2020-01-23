@@ -1,9 +1,7 @@
 # DASS Assignment 1
 ## TODO
-- redo shield
-	- timeout
-	- regen
-
+- accelerated gravity
+- input glitch
 
 ## DONE
 - collisions
@@ -34,6 +32,8 @@
 - shield
 	- colour change
 	- protects
+	- timeout
+	- regen
 - beams
 - coins
 - timer 
