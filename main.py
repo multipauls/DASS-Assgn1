@@ -10,6 +10,7 @@ from inputChar import inputChar
 
 exitCode = -1
 score = 0
+speed = 1
 def mainGame():
     ''' The game loop '''
     global exitCode
@@ -47,7 +48,6 @@ def mainGame():
             time.sleep(0.02)
             timeLeft = timeEnd - time.time()
 
-
         DinPos = Din.getCoords()
         dragonPos = dragon.getCoords()
         background(score, timeLeft, life, dragonLife)
@@ -58,35 +58,44 @@ def mainGame():
         for i in range(len(coinList)):
             coinList[i].renderObject()
             coinPos = coinList[i].getCoords()
-            if DinPos[0] == coinPos or DinPos[1] == coinPos:
-                coinList[i].changeX()
-                score += 20
+            for k in range(len(DinPos)):
+                if DinPos[k] == coinPos:
+                    coinList[i].changeX()
+                    score += 20
+                    break
 
         for i in range(len(vertBeamList)):
             vertBeamList[i].renderObject()
             vertPos = vertBeamList[i].getCoords()
             for j in range(len(vertPos)):
-                if DinPos[0] == vertPos[j] or DinPos[1] == vertPos[j]:
-                    vertBeamList[i].changeX()
-                    if not(Din.getShield()):
-                        life -= 2                    
-                    break
+                for k in range(len(DinPos)):
+                    if DinPos[k] == vertPos[j]:
+                        vertBeamList[i].changeX()
+                        vertPos = vertBeamList[i].getCoords()
+                        if not(Din.getShield()):
+                            life -= 2                    
+                        break
+
                 for k in range(len(bulletList)):
                     bulletPos = bulletList[k].getCoords()
                     if bulletPos == vertPos[j]:
                         bulletList[k].changeX()
                         vertBeamList[i].changeX()
                         break
-                    
+            
+
         for i in range(len(horiBeamList)):
             horiBeamList[i].renderObject()
             horiPos = horiBeamList[i].getCoords()
             for j in range(len(horiPos)):
-                if DinPos[0] == horiPos[j] or DinPos[1] == horiPos[j]:
-                    horiBeamList[i].changeX()
-                    if not(Din.getShield()):
-                        life -= 2
-                    break
+                for k in range(len(DinPos)):
+                    if DinPos[k] == horiPos[j]:
+                        horiBeamList[i].changeX()
+                        horiPos = horiBeamList[i].getCoords()
+                        if not(Din.getShield()):
+                            life -= 2                    
+                        break
+
                 for k in range(len(bulletList)):
                     bulletPos = bulletList[k].getCoords()
                     if bulletPos == horiPos[j]:
@@ -98,11 +107,13 @@ def mainGame():
             leftBeamList[i].renderObject()
             leftPos = leftBeamList[i].getCoords()
             for j in range(len(leftPos)):
-                if DinPos[0] == leftPos[j] or DinPos[1] == leftPos[j]:
-                    leftBeamList[i].changeX()
-                    if not(Din.getShield()):
-                        life -= 2
-                    break
+                for k in range(len(DinPos)):
+                    if DinPos[k] == leftPos[j]:
+                        leftBeamList[i].changeX()
+                        leftPos = leftBeamList[i].getCoords()
+                        if not(Din.getShield()):
+                            life -= 2                    
+                        break
                 for k in range(len(bulletList)):
                     bulletPos = bulletList[k].getCoords()
                     if bulletPos == leftPos[j]:
@@ -114,11 +125,13 @@ def mainGame():
             rightBeamList[i].renderObject()
             rightPos = rightBeamList[i].getCoords()
             for j in range(len(rightPos)):
-                if DinPos[0] == rightPos[j] or DinPos[1] == rightPos[j]:
-                    rightBeamList[i].changeX()
-                    if not(Din.getShield()):
-                        life -= 2
-                    break
+                for k in range(len(DinPos)):
+                    if DinPos[k] == rightPos[j]:
+                        rightBeamList[i].changeX()
+                        rightPos = rightBeamList[i].getCoords()
+                        if not(Din.getShield()):
+                            life -= 2                    
+                        break
                 for k in range(len(bulletList)):
                     bulletPos = bulletList[k].getCoords()
                     if bulletPos == rightPos[j]:
@@ -169,11 +182,15 @@ def mainGame():
                 enBulletList[i].renderObject()
                 enBulletPos = enBulletList[i].getCoords()
                 for j in range(len(enBulletPos)):
-                    if DinPos[0] == enBulletPos[j] or DinPos[1] == enBulletPos[j]:
-                        enBulletList[i].changeX()
-                        if not(Din.getShield()):
-                            life -= 20
-                        break
+                    for k in range(len(DinPos)):
+                        if DinPos[k] == enBulletPos[j]:
+                            enBulletList[i].changeX()
+                            if not(Din.getShield()):
+                                life -= 20
+                            break
+                    else:
+                        continue
+                    break
 
         else:    
             if (timeLeft <= spBoostTime and spBoost == None):
@@ -182,9 +199,11 @@ def mainGame():
             elif spBoost != None and spBoost.getXY()[0] != None and spBoost.getXY()[0] > 0:
                 spBoost.renderObject()
                 spPos = spBoost.getCoords()
-                if spPos == DinPos[0] or spPos == DinPos[1]:
-                    speedFlag = 1
-                    spBoost.changeX()
+                for k in range(len(DinPos)):
+                    if DinPos[k] == spPos:
+                        speedFlag = 1
+                        spBoost.changeX()
+                        break
             
 
             
@@ -240,6 +259,8 @@ def mainGame():
             Din.moveDin(val, magnetFlag, magnet.getXY()[0])
         else:
             Din.moveDin(val, magnetFlag, 0)
+        
+
 
 mainGame()
 endGame(exitCode, score)

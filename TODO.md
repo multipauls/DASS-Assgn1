@@ -1,9 +1,10 @@
 # DASS Assignment 1
 ## TODO
-- accelerated gravity
 - input glitch
+	- can't fix
 
 ## DONE
+- accelerated gravity
 - collisions
 	- coins
 	- beams

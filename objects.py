@@ -117,10 +117,10 @@ class dinObject(bgObject):
         super().__init__()
         self._y = terminalSize()[1]-3
         self._x = 7
-        self._speedBoost = 0
         self._shield = 0
         self._magAttract = 0
-
+        self._acc = 1 
+    
     def renderObject(self):
         self._coords=[[self._x,self._y],[self._x,self._y+1] ]
         if (self._shield == 0):
@@ -132,8 +132,19 @@ class dinObject(bgObject):
 
     def gravity(self, val):
         ''' Implements gravity for Din '''
-        if val != 'w' and self._y < terminalSize()[1]-3: 
-            self._y += 1
+        if val != 'w' and self._y < terminalSize()[1]-2 - self._acc: 
+            self._coords=[]
+            self._y += self._acc
+            for i in range(self._acc):
+                self._coords.append([self._x, self._y-i])
+            self._coords.append([self._x, self._y+1]) 
+
+        elif val != 'w' and self._y < terminalSize()[1]-3:
+            self._acc = terminalSize()[1]-2 - self._y
+            self._y = terminalSize()[1]-3
+            for i in range(self._acc):
+                self._coords.append([self._x, self._y-i])
+            self._coords.append([self._x, self._y+1]) 
         return self._y
 
     def magForce(self, flagVal, magX):
@@ -145,45 +156,39 @@ class dinObject(bgObject):
             elif self._x<magX:
                 self._x+=1
 
-    def speedUp(self):
-        ''' Updates speedBoost flag'''
-        self._speedBoost=1
-
 
     def shieldUp(self):
-        '''Updates shield flag '''
+        ''' Updates shield flag to True '''
         self._shield=1
 
     def shieldDown(self):
+        ''' Updates shield flag to false '''
         self._shield=0
 
     def getShield(self):
         ''' Returns shield flag '''
         return self._shield
 
+    def getAcc(self):
+        ''' Returns current acceleration due to gravity '''
+        return self._acc
+
     def moveDin(self, speedVal, magnetFlag, magX):
         ''' Moves Din '''
-        if self._speedBoost == 0:
-            if (speedVal == 'w') and self._y > 3:
+        if (speedVal == 'w'):
+            self._acc = 1
+            if self._y > 3:
                 self._y -= 1
-            elif (speedVal == 'a' and self._x > 0):
-                self._x -= 1
-            elif (speedVal == 'd' and self._x < terminalSize()[0]):
-                self._x += 1
-            else:
-                self.magForce(magnetFlag, magX)
-            self.gravity(speedVal)
-
+            
         else:
-            if (speedVal == 'w') and self._y > 3:
-                self._y -= 2
-            elif (speedVal == 'a' and self._x > 0):
-                self._x -= 2
-            elif (speedVal == 'd' and self._x < terminalSize()[0]):
-                self._x += 2
-            else:
-                self.magForce(magnetFlag, magX)
-            self.gravity(speedVal)
+            self._acc = self._acc + 1
+        if (speedVal == 'a' and self._x > 0):
+            self._x -= 1
+        elif (speedVal == 'd' and self._x < terminalSize()[0]):
+            self._x += 1
+        else:
+            self.magForce(magnetFlag, magX)
+        self.gravity(speedVal)
 
 
     
